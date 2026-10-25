@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+:root {
+  --primary: #0B5D2A;
+  --primary-dark: #084520;
+  --secondary: #2E7D32;
+  --background: #F8FAF8;
+  --foreground: #1A1A1A;
+  --muted: #6B7280;
+  --border: #E5E7EB;
+  --card: #FFFFFF;
+  --card-foreground: #1A1A1A;
+}
+
+@theme inline {
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-secondary: var(--secondary);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --font-sans: 'Inter', sans-serif;
+  --radius-card: 16px;
+  --radius-button: 12px;
+  --radius-image: 24px;
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+  }
+  ::selection {
+    background-color: #bbf7d0;
+    color: #0b4a2e;
+  }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up { animation: fadeUp 0.6s ease-out; }
+.animate-fade-in { animation: fadeIn 0.4s ease-out; }
+.animate-slide-up { animation: slideUp 0.5s ease-out; }
+
+@layer components {
+  /* Glossy specular sheen for framed images (logos, thumbnails) */
+  .gloss {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .gloss::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: inherit;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.16) 16%, rgba(255, 255, 255, 0) 42%),
+      linear-gradient(to top, rgba(4, 44, 26, 0.25) 0%, rgba(4, 44, 26, 0) 32%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  }
+
+  /* Softer sheen for large, full-bleed background images */
+  .gloss-soft::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: inherit;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.18) 0%,
+      rgba(255, 255, 255, 0.05) 22%,
+      rgba(255, 255, 255, 0) 50%
+    );
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+}

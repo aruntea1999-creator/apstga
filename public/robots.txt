@@ -1,0 +1,18 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+Disallow: /login
+Disallow: /verify
+Disallow: /privacy
+Disallow: /terms
+
+# Allow public pages
+Allow: /
+Allow: /about
+Allow: /news
+Allow: /marketplace
+Allow: /contact
+Allow: /registration
+
+# Sitemap location
+Sitemap: https://apstga.org/sitemap.xml

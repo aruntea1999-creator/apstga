@@ -1,0 +1,44 @@
+export interface LocationData {
+  districts: string[];
+  blocks: Record<string, string[]>;
+}
+
+export const locationData: LocationData = {
+  districts: [
+    "Anjaw", "Bichom", "Changlang", "Dibang Valley", "East Kameng",
+    "East Siang", "Kamle", "Keyi Panyor", "Kra Daadi", "Kurung Kumey",
+    "Leparada", "Lohit", "Longding", "Lower Dibang Valley", "Lower Siang",
+    "Lower Subansiri", "Namsai", "Pakke Kessang", "Papum Pare", "Shi Yomi",
+    "Siang", "Tawang", "Tirap", "Upper Siang", "Upper Subansiri",
+    "West Kameng", "West Siang",
+  ],
+  blocks: {
+    "Anjaw": ["Chaglagam", "Hawai-Walong", "Hayuliang", "Manchal"],
+    "Bichom": [],
+    "Changlang": ["Bordumsa", "Changlang", "Diyun", "Kantang", "Khagam-Miao", "Khimiyang", "Manmao", "Nampong", "Vijoynagar", "Yatdam"],
+    "Dibang Valley": ["Anelih Arzu", "Anini-Mepi", "Eltalin Malinye"],
+    "East Kameng": ["Bameng", "Bana", "Chayangtajo", "Khenewa", "Lada", "Pipu", "Sawa", "Seppa"],
+    "East Siang": ["Bilat", "Mebo", "Pasighat", "Ruksin"],
+    "Kamle": ["Gepen", "Kamporijo", "Persin Dollungmukh", "Puchi Geko", "Tamen-Raga"],
+    "Keyi Panyor": [],
+    "Kra Daadi": ["Chambang", "Gangte", "Palin", "Pipsorang", "Tali", "Yangte"],
+    "Kurung Kumey": ["Damin", "Koloriang", "Nyapin", "Paniasang", "Parsiparlo", "Phassang", "Polosang", "Sangram", "Sarli"],
+    "Leparada": ["Basar", "Daring", "Tirbin"],
+    "Lohit": ["Tezu", "Wakro"],
+    "Longding": ["Kanubari", "Lawnu", "Niausa", "Pongchau", "Wakka"],
+    "Lower Dibang Valley": ["Dambuk", "Hunli-Kronli", "Roing"],
+    "Lower Siang": ["Gensi", "Kangku", "Likabali", "Ramle Bango"],
+    "Lower Subansiri": ["Hong-Hari", "Pistana", "Ziro-I", "Ziro-Ii"],
+    "Namsai": ["Chowkham", "Lekang", "Namsai"],
+    "Pakke Kessang": ["Pakkekessang", "Seijosa"],
+    "Papum Pare": ["Balijan", "Borum", "Doimukh", "Kimin", "Mengio", "Sagalee"],
+    "Shi Yomi": ["Manigoan", "Mechuka-Tato"],
+    "Siang": ["Boleng", "Kaying", "Pangin", "Payum", "Rebo Parging", "Riga", "Rumgong"],
+    "Tawang": ["Jang-Thingbu", "Kitpi", "Lumla", "Mukto Bongkhar", "Tawang", "Zemithang Dudunghar"],
+    "Tirap": ["Bari Basip", "Borduria", "Dadam", "Khonsa", "Lazu", "Namsang"],
+    "Upper Siang": ["Geku", "Jengging", "Mariyang", "Singa Gelling", "Tuting", "Yingkiong"],
+    "Upper Subansiri": ["Baririjo", "Chetam", "Daporijo", "Dumporijo", "Giba", "Limeking", "Nacho", "Payeng", "Siyum", "Taksing", "Taliha"],
+    "West Kameng": ["Balemu", "Bhalukpong", "Bomdila", "Dirang", "Jamiri", "Kalaktang", "Kamengbari-Doimara", "Nafra", "Rupa", "Shergaon", "Singchung", "Thembang", "Thrizino"],
+    "West Siang": ["Aalo", "Bagra", "Basar", "Darak", "Daring", "Gensi", "Jomlo Mobuk", "Kamba", "Kangku", "Kaying", "Likabali", "Liromoba", "Mechuka", "Monigong", "Payum", "Pidi", "Rumgong", "Sibe", "Tato", "Tirbin", "Yomcha"],
+  },
+};

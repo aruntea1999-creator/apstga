@@ -1,0 +1,148 @@
+/* components/idcard/idcard.css
+   Card is laid out in a fixed 540 x 856 design box. Export code scales the whole box,
+   so nothing here uses viewport units. Load the fonts locally (see README). */
+
+.idc {
+  --green-900: #063d20;
+  --green-800: #0a5a2e;
+  --green-700: #0f6b37;
+  --gold: #c9a227;
+  --ink: #1b1b1b;
+  --muted: #5e6b62;
+  position: relative;
+  width: 540px;
+  height: 856px;
+  overflow: hidden;
+  border-radius: 34px;
+  background: #fbfcf8;
+  color: var(--ink);
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  box-sizing: border-box;
+}
+.idc *, .idc *::before, .idc *::after { box-sizing: border-box; }
+.idc img { display: block; }
+
+.idc-serif { font-family: 'Cinzel', 'Trajan Pro', Georgia, 'Times New Roman', serif; }
+
+/* ---------- shared contact strip ---------- */
+.idc-contact {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 64px;
+  background: linear-gradient(180deg, var(--green-800), var(--green-900));
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; color: #fff; font-size: 15px; white-space: nowrap;
+  border-top: 3px solid var(--gold);
+}
+.idc-contact span { display: inline-flex; align-items: center; gap: 8px; }
+.idc-contact svg { width: 22px; height: 22px; flex: none; }
+
+/* ---------- FRONT ---------- */
+.idc-front {
+  background:
+    radial-gradient(circle at 15% 60%, rgba(120,170,120,.14), transparent 40%),
+    linear-gradient(180deg, #fbfcf8 0%, #f1f6ec 100%);
+}
+.idc-header {
+  position: absolute; inset: 0 0 auto 0; height: 262px;
+  background: linear-gradient(135deg, var(--green-900) 0%, var(--green-800) 60%, #0d6a38 100%);
+  border-bottom-left-radius: 60% 40px; border-bottom-right-radius: 40% 60px;
+}
+.idc-wave { position: absolute; left: 0; right: 0; bottom: -2px; width: 100%; height: 70px; }
+.idc-leaf { position: absolute; right: 0; top: 0; height: 100%; width: 42%; object-fit: cover; opacity: .55; mix-blend-mode: screen; }
+.idc-logo {
+  position: absolute; left: 28px; top: 34px; width: 150px; height: 150px;
+  border-radius: 50%; background: #fff; padding: 6px; border: 4px solid #fff;
+  box-shadow: 0 4px 14px rgba(0,0,0,.25);
+}
+.idc-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+.idc-head-text { position: absolute; left: 198px; right: 18px; top: 52px; color: #fff; text-align: center; }
+.idc-state { font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 31px; letter-spacing: .5px; line-height: 1.1; }
+.idc-assoc { font-family: 'Cinzel', Georgia, serif; font-weight: 600; font-size: 15.5px; letter-spacing: .6px; margin-top: 8px; }
+.idc-reg { font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 19px; letter-spacing: 3px; color: #f2d46b; margin-top: 12px; }
+
+.idc-photo {
+  position: absolute; left: 62px; top: 286px; width: 196px; height: 262px;
+  border-radius: 16px; overflow: hidden; border: 4px solid var(--gold);
+  background: #e6ece2; box-shadow: 0 4px 12px rgba(0,0,0,.18);
+}
+.idc-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; }
+
+.idc-qr-wrap { position: absolute; right: 52px; top: 308px; width: 190px; text-align: center; }
+.idc-qr { width: 164px; height: 164px; margin: 0 auto; background: #fff; border: 3px solid var(--green-800); border-radius: 14px; padding: 4px; }
+.idc-qr img { width: 100%; height: 100%; }
+.idc-qr-id { margin-top: 8px; font-size: 17px; font-weight: 600; }
+.idc-qr-cap { font-size: 13px; color: var(--muted); letter-spacing: .5px; }
+
+.idc-name {
+  position: absolute; left: 20px; right: 20px; top: 566px; text-align: center;
+  font-family: 'Cinzel', Georgia, serif; font-weight: 800; color: var(--green-900);
+  white-space: nowrap; line-height: 1;
+}
+.idc-pill {
+  position: absolute; left: 50%; top: 622px; transform: translateX(-50%);
+  width: 290px; height: 42px; border-radius: 22px; background: var(--green-800);
+  color: #fff; text-align: center; line-height: 42px; font-size: 21px; font-weight: 700;
+  font-family: 'Cinzel', Georgia, serif; letter-spacing: 2px; border-bottom: 3px solid var(--gold);
+}
+
+.idc-details {
+  position: absolute; left: 34px; right: 34px; top: 684px; margin: 0;
+  display: grid; grid-template-columns: 150px 1fr; row-gap: 6px; font-size: 25px; line-height: 1.2;
+}
+.idc-details dt { color: var(--muted); font-weight: 600; font-size: 23px; }
+.idc-details dd { margin: 0; font-weight: 500; }
+.idc-addr { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+.idc-sign { position: absolute; left: 34px; bottom: 78px; width: 250px; }
+.idc-sign img { height: 62px; width: auto; max-width: 220px; object-fit: contain; }
+.idc-sign-blank { height: 52px; border-bottom: 1.5px solid #444; margin-bottom: 4px; }
+.idc-sign-l1 { font-size: 15px; font-weight: 600; border-top: 1.5px solid #444; padding-top: 4px; }
+.idc-sign-l2 { font-size: 14px; color: #333; }
+
+.idc-valid { position: absolute; right: 30px; bottom: 80px; text-align: center; }
+.idc-valid svg { margin: 0 auto; }
+.idc-valid-t { font-family: 'Cinzel', Georgia, serif; font-weight: 800; font-size: 26px; color: var(--green-800); border-top: 2px solid var(--green-800); padding-top: 2px; }
+.idc-valid-u { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+/* ---------- BACK ---------- */
+.idc-back {
+  background:
+    radial-gradient(circle at 85% 8%, rgba(150,190,150,.25), transparent 35%),
+    linear-gradient(180deg, #f9fbf5 0%, #e9f1e2 100%);
+}
+.idc-back-top { position: absolute; inset: 0 0 auto 0; height: 330px; text-align: center; padding-top: 44px; }
+.idc-back-leaf { position: absolute; right: 0; top: 0; width: 52%; height: 100%; object-fit: cover; opacity: .18; }
+.idc-back-short { font-family: 'Cinzel', Georgia, serif; font-weight: 800; font-size: 92px; line-height: 1; color: var(--green-900); letter-spacing: 1px; position: relative; }
+.idc-back-state { font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 24px; letter-spacing: 4px; color: var(--green-800); margin-top: 8px; position: relative; }
+.idc-back-assoc { font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 22px; letter-spacing: 2px; color: var(--green-800); margin-top: 6px; position: relative; }
+.idc-back-reg { display: flex; align-items: center; justify-content: center; gap: 12px; font-family: 'Cinzel', Georgia, serif; font-size: 18px; letter-spacing: 3px; margin-top: 12px; color: #333; position: relative; }
+.idc-back-reg i { display: block; width: 60px; height: 2px; background: var(--gold); }
+.idc-tagline { font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-size: 22px; letter-spacing: 2.5px; line-height: 1.6; color: var(--green-800); margin-top: 18px; position: relative; }
+
+.idc-panel { position: absolute; left: 26px; right: 26px; }
+.idc-panel-details { top: 346px; }
+.idc-panel-info { top: 612px; }
+.idc-tab {
+  display: inline-block; height: 40px; line-height: 40px; padding: 0 34px 0 28px;
+  background: var(--green-800); color: #fff; font-family: 'Cinzel', Georgia, serif; font-weight: 700;
+  font-size: 18px; letter-spacing: 3px; border-radius: 18px 18px 0 0; border-bottom: 3px solid var(--gold);
+}
+.idc-panel::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 40px; background: var(--green-800); border-radius: 18px 18px 0 0; z-index: -1; }
+.idc-panel-body { background: #fff; border-radius: 0 0 20px 20px; padding: 16px 22px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+.idc-row { display: grid; grid-template-columns: 200px 20px 1fr; align-items: baseline; padding: 6px 0; font-size: 25px; }
+.idc-row .k { font-weight: 600; font-family: 'Cinzel', Georgia, serif; font-size: 22px; color: #2a2a2a; }
+.idc-row .v { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.idc-note { display: flex; gap: 12px; align-items: flex-start; font-size: 17px; line-height: 1.3; padding: 5px 0; }
+.idc-note svg { flex: none; margin-top: 1px; }
+
+.idc-back-foot { position: absolute; left: 0; right: 0; bottom: 70px; text-align: center; color: #fff; font-family: 'Cinzel', Georgia, serif; }
+.idc-back-foot-t1 { font-size: 15px; letter-spacing: 6px; font-weight: 700; }
+.idc-back-foot-t2 { font-size: 14px; letter-spacing: 3px; margin-top: 4px; }
+.idc-back::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 150px; z-index: 0;
+  background: linear-gradient(180deg, transparent, rgba(6,61,32,.0) 5%, var(--green-800) 38%, var(--green-900) 100%);
+  border-top: 0;
+}
+.idc-back-foot, .idc-back .idc-contact { z-index: 2; }
+
+.idc-contact span:nth-child(2) { font-size: 14px; }

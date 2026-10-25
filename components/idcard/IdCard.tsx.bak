@@ -1,0 +1,30 @@
+// components/idcard/IdCard.tsx
+// Front + back card faces. Pure presentational; every value comes from props.
+// Fixed canvas 638 x 1011 px (CR80 portrait at 300 DPI).
+// No position:absolute for text — CSS grid/flexbox only. No truncation.
+// Source: rebuilt per layout spec.
+
+import React, { forwardRef, useEffect, useRef, useState } from 'react';
+import JsBarcode from 'jsbarcode';
+import './idcard.css';
+import {
+  ASSOC, CARD_NOTES, CardAssets, CardContact, GrowerCardData,
+  fmtDate, fmtHa, fmtLongDate,
+} from '@/lib/idcard';
+
+/* eslint-disable @next/next/no-img-element */
+
+type FaceProps = {
+  data: GrowerCardData;
+  assets: CardAssets;
+  contact: CardContact;
+  qrDataUrl: string;
+  photoDataUrl: string;
+};
+
+const Leaf = ({ size = 40 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
+    <path d="M32 58V30" stroke="#0b5a2e" strokeWidth="4" strokeLinecap="round" />
+    <path d="M32 32C14 32 6 20 6 8c16 0 26 8 26 24z" fill="#0b6b34" />
+    <path d="M32 40c0-14 8-22 26-4z" fill="#0b6b34" />
+  </svg>

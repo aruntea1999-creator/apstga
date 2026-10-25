@@ -1,0 +1,353 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  SUPER_ADMIN
+  DISTRICT_ADMIN
+  OPERATOR
+  VIEWER
+}
+
+enum OrganicStatus {
+  ORGANIC
+  CONVENTIONAL
+  IN_TRANSITION
+}
+
+enum TeaVariety {
+  ASSAM
+  CHINESE
+  CLONAL
+  MIXED
+}
+
+enum GrowerStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String?
+  email        String   @unique
+  password     String?
+  role         Role     @default(VIEWER)
+  image        String?
+  district     String?
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  auditLogs AuditLog[]
+  sessions  Session[]
+  accounts  Account[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model District {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  code      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  villages   Village[]
+  growers    Grower[]
+  statistics Statistic[]
+  productionRecords ProductionRecord[]
+}
+
+model Village {
+  id         String   @id @default(cuid())
+  name       String
+  districtId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  district District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+  growers  Grower[]
+}
+
+model Grower {
+  id               String        @id @default(cuid())
+  membershipId     String        @unique
+  name             String
+  fatherName       String
+  gender           String
+  dob              DateTime
+  mobile           String
+  email            String?
+  districtId       String
+  circle           String
+  villageId        String
+  address          String
+  aadhaar          String        @unique
+  pan              String?
+  photo            String?
+  teaGardenName    String
+  teaArea          Float
+  plantationYear   Int?
+  annualProduction Float
+  organicStatus    OrganicStatus @default(CONVENTIONAL)
+  teaVariety       TeaVariety    @default(MIXED)
+  latitude         Float?
+  longitude        Float?
+  bankName         String?
+  bankBranch       String?
+  accountNumber    String?
+  ifscCode         String?
+  documents        String?
+  status           GrowerStatus  @default(PENDING)
+  approvedBy       String?
+  approvedAt       DateTime?
+  registeredAt     DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  district    District        @relation(fields: [districtId], references: [id])
+  village     Village         @relation(fields: [villageId], references: [id])
+  payments    Payment[]
+  notifications Notification[]
+  attachments GrowerDocument[]
+
+  @@index([status])
+  @@index([districtId])
+  @@index([registeredAt])
+  @@index([mobile])
+  @@index([name])
+}
+
+model GrowerDocument {
+  id        String   @id @default(cuid())
+  growerId  String
+  type      String
+  name      String
+  mimeType  String
+  size      Int
+  data      Bytes
+  createdAt DateTime @default(now())
+
+  grower Grower @relation(fields: [growerId], references: [id], onDelete: Cascade)
+
+  @@index([growerId])
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  growerId    String
+  amount      Float
+  method      String   // UPI | Card | Net Banking | Cash
+  collectedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  grower Grower @relation(fields: [growerId], references: [id], onDelete: Cascade)
+
+  @@index([growerId])
+  @@index([collectedAt])
+  @@index([method])
+}
+
+model Notification {
+  id              String   @id @default(cuid())
+  type            String   // user_plus | credit_card | file_text | map_pin
+  title           String
+  description     String?
+  relatedGrowerId String?
+  createdAt       DateTime @default(now())
+
+  grower Grower? @relation(fields: [relatedGrowerId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([type])
+}
+
+model ProductionRecord {
+  id          String   @id @default(cuid())
+  districtId  String
+  year        Int
+  month       Int      // 1-12
+  quantityMt  Float
+  areaHa      Float
+  recordedAt  DateTime @default(now())
+
+  district District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+
+  @@unique([districtId, year, month])
+  @@index([districtId])
+  @@index([year])
+}
+
+model Statistic {
+  id                   String   @id @default(cuid())
+  districtId           String
+  year                 Int
+  totalGrowers         Int
+  teaArea              Float
+  greenLeafProduction  Float
+  organicGrowers       Int
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  district District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+
+  @@unique([districtId, year])
+}
+
+model News {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  content   String   @db.Text
+  excerpt   String?
+  image     String?
+  category  String?
+  published Boolean  @default(false)
+  authorId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OurWork {
+  id          String   @id @default(cuid())
+  url         String
+  title       String?
+  description String?  @db.Text
+  image       String?
+  imageData   Bytes?
+  imageType   String?
+  video       String?
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([createdAt])
+}
+
+model ExecutiveMember {
+  id          String   @id @default(cuid())
+  name        String
+  designation String
+  photo       Bytes?
+  photoType   String?
+  sortOrder   Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([active, sortOrder])
+  @@index([createdAt])
+}
+
+model Gallery {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  image       String
+  category    String?
+  uploadedBy  String?
+  createdAt   DateTime @default(now())
+}
+
+model Download {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  file        String
+  category    String?
+  size        String?
+  uploadedBy  String?
+  createdAt   DateTime @default(now())
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  date        DateTime
+  location    String?
+  image       String?
+  category    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([date])
+}
+
+model Newsletter {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([read])
+  @@index([createdAt])
+}
+
+model Setting {
+  key       String   @id
+  value     String?  @db.Text
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  details   String?  @db.Text
+  ip        String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+}
