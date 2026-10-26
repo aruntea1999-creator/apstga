@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { requireAdmin } from "@/lib/admin-guard";
-import type { User } from "@prisma/client";
 
 const ROLES = ["SUPER_ADMIN", "DISTRICT_ADMIN", "OPERATOR", "VIEWER"] as const;
 
@@ -11,7 +10,7 @@ export async function GET() {
   if (denied) return denied;
 
   try {
-    const users: User[] = await prisma.user.findMany({
+    const users = await prisma.user.findMany({
       orderBy: { createdAt: "asc" },
     });
 
@@ -45,9 +44,7 @@ export async function POST(request: Request) {
     const email = String(body?.email || "")
       .trim()
       .toLowerCase();
-    const role: (typeof ROLES)[number] = ROLES.includes(body?.role)
-      ? body.role
-      : "VIEWER";
+    const role = ROLES.includes(body?.role) ? body.role : "VIEWER";
     const password = String(body?.password || "");
 
     if (!name || !email) {
