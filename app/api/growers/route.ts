@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { describeDatabaseError, prisma } from "@/lib/db";
 
 export async function GET(request: Request) {
   try {
@@ -49,7 +49,12 @@ export async function GET(request: Request) {
         village: g.village?.name ?? "",
       })),
     });
-  } catch {
-    return NextResponse.json({ error: "Failed to load growers" }, { status: 500 });
+  } catch (error: unknown) {
+    const dbError = describeDatabaseError(error);
+    console.error("Growers GET failed:", dbError.code);
+    return NextResponse.json(
+      { error: dbError.message, code: dbError.code },
+      { status: dbError.status },
+    );
   }
 }

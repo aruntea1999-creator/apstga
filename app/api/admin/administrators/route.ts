@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { describeDatabaseError, prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { requireAdmin } from "@/lib/admin-guard";
 import type { User } from "@prisma/client";
@@ -28,10 +28,12 @@ export async function GET() {
         createdAt: u.createdAt,
       })),
     });
-  } catch {
+  } catch (error: unknown) {
+    const dbError = describeDatabaseError(error);
+    console.error("Administrators GET failed:", dbError.code);
     return NextResponse.json(
-      { error: "Failed to load administrators" },
-      { status: 500 },
+      { error: dbError.message, code: dbError.code },
+      { status: dbError.status },
     );
   }
 }
@@ -99,22 +101,20 @@ export async function POST(request: Request) {
       },
       { status: 201 },
     );
-  } catch (e: unknown) {
-    if (
-      typeof e === "object" &&
-      e !== null &&
-      "code" in e &&
-      e.code === "P2002"
-    ) {
+  } catch (error: unknown) {
+    const dbError = describeDatabaseError(error);
+
+    if (dbError.code === "P2002") {
       return NextResponse.json(
-        { error: "A user with this email already exists." },
+        { error: "A user with this email already exists.", code: dbError.code },
         { status: 409 },
       );
     }
 
+    console.error("Administrators POST failed:", dbError.code);
     return NextResponse.json(
-      { error: "Failed to create administrator" },
-      { status: 500 },
+      { error: dbError.message, code: dbError.code },
+      { status: dbError.status },
     );
   }
 }

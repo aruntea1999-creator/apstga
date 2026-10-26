@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { describeDatabaseError, prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { requireAdmin } from "@/lib/admin-guard";
 
@@ -84,10 +84,12 @@ export async function PATCH(request: Request, { params }: Params) {
         district: user.district,
       },
     });
-  } catch {
+  } catch (error: unknown) {
+    const dbError = describeDatabaseError(error);
+    console.error("Administrators PATCH failed:", dbError.code);
     return NextResponse.json(
-      { error: "Failed to update administrator" },
-      { status: 500 },
+      { error: dbError.message, code: dbError.code },
+      { status: dbError.status },
     );
   }
 }
@@ -104,10 +106,12 @@ export async function DELETE(_request: Request, { params }: Params) {
     });
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error: unknown) {
+    const dbError = describeDatabaseError(error);
+    console.error("Administrators DELETE failed:", dbError.code);
     return NextResponse.json(
-      { error: "Failed to delete administrator" },
-      { status: 500 },
+      { error: dbError.message, code: dbError.code },
+      { status: dbError.status },
     );
   }
 }

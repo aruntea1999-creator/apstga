@@ -19,10 +19,20 @@ const roleLabels: Record<string, string> = {
   VIEWER: "Viewer",
 };
 
+type Administrator = {
+  id: string;
+  name: string | null;
+  email: string;
+  role: string;
+  active: boolean;
+  district: string | null;
+  createdAt: string;
+};
+
 const emptyForm = { name: "", email: "", role: "VIEWER", active: true, password: "", district: "" };
 
 export default function AdministratorsPage() {
-  const [admins, setAdmins] = useState<any[]>([]);
+  const [admins, setAdmins] = useState<Administrator[]>([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -34,11 +44,17 @@ export default function AdministratorsPage() {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/administrators");
-      if (!res.ok) throw new Error();
-      const json = await res.json();
-      setAdmins(json.users || []);
-    } catch {
-      setToast({ type: "error", text: "Failed to load administrators." });
+      const json = (await res.json().catch(() => ({}))) as {
+        users?: Administrator[];
+        error?: string;
+      };
+      if (!res.ok) throw new Error(json.error || "Failed to load administrators.");
+      setAdmins(Array.isArray(json.users) ? json.users : []);
+    } catch (error: unknown) {
+      setToast({
+        type: "error",
+        text: error instanceof Error ? error.message : "Failed to load administrators.",
+      });
     } finally {
       setLoading(false);
     }
@@ -57,7 +73,7 @@ export default function AdministratorsPage() {
     setShowModal(true);
   };
 
-  const openEdit = (a: any) => {
+  const openEdit = (a: Administrator) => {
     setEditingId(a.id);
     setForm({ name: a.name || "", email: a.email || "", role: a.role || "VIEWER", active: a.active, password: "", district: a.district || "" });
     setShowModal(true);
@@ -68,7 +84,14 @@ export default function AdministratorsPage() {
     setToast(null);
     try {
       const url = editingId ? `/api/admin/administrators/${editingId}` : "/api/admin/administrators";
-      const body: any = { name: form.name, role: form.role, active: form.active, district: form.district };
+      const body: {
+        name: string;
+        role: string;
+        active: boolean;
+        district: string;
+        email?: string;
+        password?: string;
+      } = { name: form.name, role: form.role, active: form.active, district: form.district };
       if (!editingId) body.email = form.email;
       if (form.password) body.password = form.password;
       const res = await fetch(url, {
@@ -81,8 +104,11 @@ export default function AdministratorsPage() {
       setToast({ type: "success", text: editingId ? "Administrator updated." : "Administrator added." });
       setShowModal(false);
       fetchAdmins();
-    } catch (e: any) {
-      setToast({ type: "error", text: e.message || "Failed to save administrator." });
+    } catch (error: unknown) {
+      setToast({
+        type: "error",
+        text: error instanceof Error ? error.message : "Failed to save administrator.",
+      });
     } finally {
       setSaving(false);
     }
@@ -92,25 +118,33 @@ export default function AdministratorsPage() {
     if (!confirm("Delete this administrator?")) return;
     try {
       const res = await fetch(`/api/admin/administrators/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error();
+      const json = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) throw new Error(json.error || "Failed to delete administrator.");
       setToast({ type: "success", text: "Administrator deleted." });
       fetchAdmins();
-    } catch {
-      setToast({ type: "error", text: "Failed to delete administrator." });
+    } catch (error: unknown) {
+      setToast({
+        type: "error",
+        text: error instanceof Error ? error.message : "Failed to delete administrator.",
+      });
     }
   };
 
-  const toggleActive = async (a: any) => {
+  const toggleActive = async (a: Administrator) => {
     try {
       const res = await fetch(`/api/admin/administrators/${a.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ active: !a.active }),
       });
-      if (!res.ok) throw new Error();
+      const json = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) throw new Error(json.error || "Failed to update status.");
       fetchAdmins();
-    } catch {
-      setToast({ type: "error", text: "Failed to update status." });
+    } catch (error: unknown) {
+      setToast({
+        type: "error",
+        text: error instanceof Error ? error.message : "Failed to update status.",
+      });
     }
   };
 

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { describeDatabaseError, prisma } from "@/lib/db";
 
 function read(fd: FormData, name: string): string {
   const v = fd.get(name);
@@ -127,6 +127,7 @@ export async function POST(request: Request) {
   const email = read(fd, "email");
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return NextResponse.json({ error: "A valid email address is required." }, { status: 400 });
 
+  try {
   const existing = await prisma.grower.findUnique({ where: { aadhaar } });
   if (existing) {
     return NextResponse.json({ error: DUPLICATE_AADHAAR_MESSAGE }, { status: 409 });
@@ -152,7 +153,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: captured.error }, { status: 400 });
   }
 
-  try {
     const created = await prisma.grower.create({
       data: {
         membershipId,
@@ -203,11 +203,18 @@ export async function POST(request: Request) {
       { success: true, applicationNo: membershipId, message: "Registration submitted successfully" },
       { status: 201 }
     );
-  } catch (e: any) {
-    if (e?.code === "P2002") {
-      return NextResponse.json({ error: DUPLICATE_AADHAAR_MESSAGE }, { status: 409 });
+  } catch (error: unknown) {
+    const dbError = describeDatabaseError(error);
+    if (dbError.code === "P2002") {
+      return NextResponse.json(
+        { error: DUPLICATE_AADHAAR_MESSAGE, code: dbError.code },
+        { status: 409 },
+      );
     }
-    console.error("Register API error:", e);
-    return NextResponse.json({ error: "Failed to submit registration. Please try again." }, { status: 500 });
+    console.error("Register API failed:", dbError.code);
+    return NextResponse.json(
+      { error: dbError.message, code: dbError.code },
+      { status: dbError.status },
+    );
   }
 }
