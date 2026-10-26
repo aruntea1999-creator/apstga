@@ -4,6 +4,8 @@ import { compare } from "bcryptjs";
 import { prisma } from "@/lib/db";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  // Trust the Host header from the hosting proxy (Vercel, etc.).
+  trustHost: true,
   providers: [
     Credentials({
       name: "credentials",
