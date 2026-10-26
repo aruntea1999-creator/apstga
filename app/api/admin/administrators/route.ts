@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import { requireAdmin } from "@/lib/admin-guard";
 import type { User } from "@prisma/client";
 
+export const dynamic = "force-dynamic";
+
 const ROLES = ["SUPER_ADMIN", "DISTRICT_ADMIN", "OPERATOR", "VIEWER"] as const;
 
 export async function GET() {

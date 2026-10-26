@@ -13,6 +13,21 @@ function createClient(): PrismaClient {
   });
 }
 
-export const prisma = globalForPrisma.prisma ?? createClient();
+function getClient(): PrismaClient {
+  if (globalForPrisma.prisma) return globalForPrisma.prisma;
+  const client = createClient();
+  globalForPrisma.prisma = client;
+  return client;
+}
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+// The real client is created on first property access, never at import time.
+// This keeps `next build` from failing when DATABASE_URL is absent.
+export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
+  get(_target, property) {
+    const client = getClient();
+    const value: unknown = Reflect.get(client, property, client);
+    return typeof value === "function"
+      ? (value as (...args: unknown[]) => unknown).bind(client)
+      : value;
+  },
+});

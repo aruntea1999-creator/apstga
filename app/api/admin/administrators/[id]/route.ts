@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { requireAdmin } from "@/lib/admin-guard";
 
+export const dynamic = "force-dynamic";
+
 type Params = { params: Promise<{ id: string }> };
 
 type AdministratorUpdate = {
