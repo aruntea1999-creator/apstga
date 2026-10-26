@@ -3,7 +3,23 @@ import Credentials from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { prisma } from "@/lib/db";
 
+if (process.env.NODE_ENV === "production") {
+  // TEMP: boolean-only diagnostic. Remove after Vercel env vars are confirmed.
+  console.log("[auth-config]", {
+    AUTH_SECRET_PRESENT: Boolean(process.env.AUTH_SECRET),
+    NEXTAUTH_SECRET_PRESENT: Boolean(process.env.NEXTAUTH_SECRET),
+    RESOLVED_SECRET_PRESENT: Boolean(
+      process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+    ),
+    AUTH_URL_PRESENT: Boolean(process.env.AUTH_URL),
+    NEXTAUTH_URL_PRESENT: Boolean(process.env.NEXTAUTH_URL),
+    DATABASE_URL_PRESENT: Boolean(process.env.DATABASE_URL),
+    VERCEL: Boolean(process.env.VERCEL),
+  });
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   // Trust the Host header from the hosting proxy (Vercel, etc.).
   trustHost: true,
   providers: [
