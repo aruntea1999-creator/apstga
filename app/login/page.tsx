@@ -5,21 +5,54 @@ import { useSearchParams } from "next/navigation";
 import { getCsrfToken } from "next-auth/react";
 import { Leaf, Eye, EyeOff, Loader2 } from "lucide-react";
 
+type CsrfStatus = "loading" | "ready" | "error";
+
 function LoginForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/admin";
   const errorParam = searchParams.get("error");
 
   const [csrfToken, setCsrfToken] = useState("");
+  const [csrfStatus, setCsrfStatus] = useState<CsrfStatus>("loading");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    getCsrfToken().then(setCsrfToken);
-    if (errorParam) setError("Invalid username or password");
+    let cancelled = false;
+
+    setCsrfStatus("loading");
+    getCsrfToken()
+      .then((token) => {
+        if (cancelled) return;
+        if (token) {
+          setCsrfToken(token);
+          setCsrfStatus("ready");
+        } else {
+          setCsrfStatus("error");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setCsrfStatus("error");
+      });
+
+    if (errorParam) {
+      setError(
+        errorParam === "Configuration"
+          ? "Login is unavailable because server authentication is not configured."
+          : "Invalid username or password",
+      );
+    } else {
+      setError("");
+    }
+
+    return () => {
+      cancelled = true;
+    };
   }, [errorParam]);
+
+  const csrfFailed = csrfStatus === "error";
 
   return (
     <div className="min-h-screen bg-[#F8FAF8] flex items-center justify-center px-4">
@@ -35,6 +68,11 @@ function LoginForm() {
         <form
           action="/api/auth/callback/credentials"
           method="POST"
+          onSubmit={(event) => {
+            if (!csrfToken) {
+              event.preventDefault();
+            }
+          }}
           className="rounded-[20px] border border-border shadow-sm p-7 space-y-5 relative overflow-hidden"
         >
           <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url(/LOGIN%20PAGE/LOGIN%20IMAGE.png)" }} />
@@ -43,7 +81,13 @@ function LoginForm() {
           <input type="hidden" name="csrfToken" value={csrfToken} />
           <input type="hidden" name="callbackUrl" value={callbackUrl} />
 
-          {error && (
+          {csrfFailed && (
+            <div className="bg-amber-500/20 border border-amber-400/40 rounded-[12px] px-4 py-3 text-sm text-white">
+              Login is unavailable: server authentication is not configured. Please contact the administrator.
+            </div>
+          )}
+
+          {!csrfFailed && error && (
             <div className="bg-red-500/20 border border-red-400/40 rounded-[12px] px-4 py-3 text-sm text-white">
               {error}
             </div>
@@ -87,7 +131,7 @@ function LoginForm() {
 
           <button
             type="submit"
-            disabled={!csrfToken}
+            disabled={csrfStatus === "loading"}
             className="w-full h-11 rounded-[12px] bg-[#166534] text-white text-sm font-bold hover:bg-[#0F5D31] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
           >
             Sign In
