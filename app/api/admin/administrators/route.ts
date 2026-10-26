@@ -1,9 +1,25 @@
+```typescript
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { requireAdmin } from "@/lib/admin-guard";
 
-const ROLES = ["SUPER_ADMIN", "DISTRICT_ADMIN", "OPERATOR", "VIEWER"] as const;
+const ROLES = [
+  "SUPER_ADMIN",
+  "DISTRICT_ADMIN",
+  "OPERATOR",
+  "VIEWER",
+];
+
+type AdministratorListItem = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  active: boolean;
+  district: string | null;
+  createdAt: Date;
+};
 
 export async function GET() {
   const denied = await requireAdmin();
@@ -15,7 +31,7 @@ export async function GET() {
     });
 
     return NextResponse.json({
-      users: users.map((u) => ({
+      users: users.map((u: AdministratorListItem) => ({
         id: u.id,
         name: u.name,
         email: u.email,
@@ -41,10 +57,10 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     const name = String(body?.name || "").trim();
-    const email = String(body?.email || "")
-      .trim()
-      .toLowerCase();
-    const role = ROLES.includes(body?.role) ? body.role : "VIEWER";
+    const email = String(body?.email || "").trim().toLowerCase();
+    const role = ROLES.includes(body?.role)
+      ? body.role
+      : "VIEWER";
     const password = String(body?.password || "");
 
     if (!name || !email) {
@@ -68,7 +84,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const hash = password ? bcrypt.hashSync(password, 10) : null;
+    const hash = password
+      ? bcrypt.hashSync(password, 10)
+      : null;
 
     const user = await prisma.user.create({
       data: {
@@ -77,7 +95,9 @@ export async function POST(request: Request) {
         role,
         password: hash,
         active: body?.active !== false,
-        district: body?.district ? String(body.district).trim() : null,
+        district: body?.district
+          ? String(body.district).trim()
+          : null,
       },
     });
 
@@ -113,3 +133,4 @@ export async function POST(request: Request) {
     );
   }
 }
+```;
